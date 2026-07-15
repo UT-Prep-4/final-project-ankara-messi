@@ -65,6 +65,7 @@ the grader reads all of them). Delete this line and start!
 '''
 import pygame
 import sys
+import turtle
 
 
 pygame.init()
@@ -428,7 +429,43 @@ startY = -1
 targetX = -1
 targetY = -1
 
+def highlight_moves(white_move, startC, startR, SQUARE_SIZE):
+    startPiece = BOARD[startR][startC]
+
+    piece_color = startPiece[0]
+    piece_type = startPiece[1]
+
+    
+    
+    for r in range(8):
+        for c in range(8):
+            if is_legal_move(white_move, startC, startR, c, r):
+                x = c * SQUARE_SIZE
+                y = r * SQUARE_SIZE
+                #pygame.draw.circle(screen, color=(100,100,100), center=(x,y), radius=1, width=0)
+                pygame.draw.rect(screen, (100,100,100), pygame.Rect(x, y, SQUARE_SIZE, SQUARE_SIZE))
+
+
+
+def check(white_move, startC, startR, targetC, targetR):
+    startPiece = BOARD[startR][startC]
+
+    piece_color = startPiece[0]
+    piece_type = startPiece[1]
+    for r in range(8):
+        for c in range(8):
+            target = BOARD[r][c]
+            target_type = target[1]
+            if is_legal_move(white_move, startC, startR, c, r) and target_type == "K":
+                print("ChECK!!!")
+    
+
+    
+
+
+
 while True:
+    
     for event in pygame.event.get():
 
         if event.type == pygame.QUIT:
@@ -448,6 +485,8 @@ while True:
                 targetY = -1
 
                 print("Selected:", startX, startY)
+                #highlight_moves(startX, startY, SQUARE_SIZE)
+                pygame.draw.rect(screen, (255,255,0), pygame.Rect(256, 320, SQUARE_SIZE, SQUARE_SIZE))
 
             # Second click: choose where the piece moves.
             elif count == 2:
@@ -478,6 +517,11 @@ while True:
                 # Reset after the second click.
                 count = 0
 
-    draw_board()
+    if count == 1:
+        draw_board()
+        highlight_moves(white_move, startX, startY, SQUARE_SIZE)
+    else:
+        draw_board()
+    #check(white_move, startX, startY)
     draw_pieces()
     pygame.display.flip()
