@@ -442,22 +442,33 @@ def highlight_moves(white_move, startC, startR, SQUARE_SIZE):
             if is_legal_move(white_move, startC, startR, c, r):
                 x = c * SQUARE_SIZE
                 y = r * SQUARE_SIZE
-                #pygame.draw.circle(screen, color=(100,100,100), center=(x,y), radius=1, width=0)
                 pygame.draw.rect(screen, (100,100,100), pygame.Rect(x, y, SQUARE_SIZE, SQUARE_SIZE))
 
 
 
-def check(white_move, startC, startR, targetC, targetR):
-    startPiece = BOARD[startR][startC]
+def is_in_check(white_move, startC, startR, targetC, targetR):
 
-    piece_color = startPiece[0]
-    piece_type = startPiece[1]
+    
     for r in range(8):
         for c in range(8):
-            target = BOARD[r][c]
-            target_type = target[1]
+            piece = BOARD[r][c]
+
+            piece_color = piece[0]
+            piece_type = piece[1]
+            
+
+            for r1 in range(8):
+                for c1 in range(8):
+                    target_piece = BOARD[r1][c1]
+                    if is_legal_move(white_move, c, r, c1, r1) and target_piece[1] == "K":
+                        print("CHECKKKK")
+                        #return True
+                    
+    #return False
+
+
             if is_legal_move(white_move, startC, startR, c, r) and target_type == "K":
-                print("ChECK!!!")
+                print("CHECK!!!")
     
 
     
