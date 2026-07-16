@@ -140,6 +140,8 @@ def is_clear_path(startC, startR, targetC, targetR):
 white_move = True
 
 
+
+
 def is_legal_move(white_move, startC, startR, targetC, targetR):
     """Checks whether a selected move is legal.
     Returns True or False."""
@@ -250,6 +252,10 @@ def is_legal_move(white_move, startC, startR, targetC, targetR):
         if abs(row_change) <= 1 and abs(col_change) <= 1:
             return True
         return False
+    
+    
+
+
 
     # Reject any move that did not match a piece's rules.
     return False
@@ -261,19 +267,58 @@ startY = -1
 targetX = -1
 targetY = -1
 
+def discover_check(startC, startR, targetC, targetR, BOARD):
+    BOARD_COPY = BOARD
 
-def highlight_moves(white_move, startC, startR, SQUARE_SIZE):
+    start = BOARD_COPY[startR][startC]
+    target = BOARD_COPY[targetR][targetC]
+
+    BOARD_COPY[targetR][targetC] = BOARD_COPY[startR][startC]
+    BOARD_COPY[startR][startC] = "--"
+
+    if is_in_check("w") or is_in_check("b"):
+        BOARD_COPY[startR][startC] = start
+        BOARD_COPY[targetR][targetC] = target
+
+        return True
+
+    BOARD_COPY[startR][startC] = start
+    BOARD_COPY[targetR][targetC] = target
+    return False
+
+
+
+def highlight_moves(white_move, startC, startR, SQUARE_SIZE, BOARD):
     startPiece = BOARD[startR][startC]
     piece_color = startPiece[0]
     piece_type = startPiece[1]
 
     for r in range(8):
         for c in range(8):
-            if is_legal_move(white_move, startC, startR, c, r):
+            if is_in_check("w") or is_in_check("b") and piece_type != "K":
+                pass
+
+            elif is_legal_move(white_move, startC, startR, c, r) and not(discover_check(startC, startR, c, r, BOARD)):
+
                 x = c * SQUARE_SIZE
                 y = r * SQUARE_SIZE
                 pygame.draw.rect(screen, (100, 100, 100), pygame.Rect(x, y, SQUARE_SIZE, SQUARE_SIZE))
 
+def highlight_selected(color, c, r):
+    piece = BOARD[r][c]
+
+    if (piece[0] == "w" and color) or piece[0] == "b" and not(color):
+
+    
+        x = c * SQUARE_SIZE
+        y = r * SQUARE_SIZE
+        pygame.draw.rect(screen, (255, 255, 0), pygame.Rect(x, y, SQUARE_SIZE, SQUARE_SIZE), 5)
+
+def highlight_king(color):
+    c, r = find_king(color)
+    x = c * SQUARE_SIZE
+    y = r * SQUARE_SIZE
+    pygame.draw.rect(screen, (255, 0, 0), pygame.Rect(x, y, SQUARE_SIZE, SQUARE_SIZE))
 
 
 def find_king(color):
@@ -372,6 +417,8 @@ def is_square_attacked(targetC, targetR, attacking_color):
                     return True
 
     return False
+
+
 
 
 def is_in_check(color):
@@ -571,10 +618,15 @@ while True:
 
     if count == 1:
         draw_board()
-        highlight_moves(white_move, startX, startY, SQUARE_SIZE)
+        highlight_moves(white_move, startX, startY, SQUARE_SIZE, BOARD)
+        highlight_selected(white_move, startX, startY)
     else:
         draw_board()
 
+    if is_in_check("w"):
+        highlight_king("w")
+    elif is_in_check("b"):
+        highlight_king("b")
     
     draw_pieces()
     if game_over:
